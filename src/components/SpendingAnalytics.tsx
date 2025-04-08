@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,11 +14,9 @@ const SpendingAnalytics: React.FC = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1', '#a4de6c', '#d0ed57'];
 
-  // Filter transactions based on time range
   const filteredTransactions = useMemo(() => {
     const now = new Date();
     
-    // Only consider expenses for analytics
     const expenseTransactions = transactions.filter(t => t.type === 'expense');
     
     if (timeRange === 'all') return expenseTransactions;
@@ -33,7 +30,6 @@ const SpendingAnalytics: React.FC = () => {
     });
   }, [transactions, timeRange]);
 
-  // Category spending data for pie chart
   const categoryData = useMemo(() => {
     const categorySpending: Record<string, number> = {};
     
@@ -49,23 +45,20 @@ const SpendingAnalytics: React.FC = () => {
       .sort((a, b) => b.value - a.value);
   }, [filteredTransactions]);
 
-  // Payment method data
   const paymentMethodData = useMemo(() => {
     const methodSpending: Record<string, number> = {};
     
     filteredTransactions.forEach(transaction => {
-      // Here is the fix: We'll create a display name for the payment method
-      let methodDisplayName = transaction.paymentMethod;
+      let displayName = transaction.paymentMethod;
       
-      // If it's mobile money and has a provider, append the provider name
       if (transaction.paymentMethod === 'mobileMoney' && transaction.mobileMoneyProvider) {
-        methodDisplayName = `${transaction.mobileMoneyProvider} Mobile Money`;
+        displayName = `${transaction.mobileMoneyProvider} Mobile Money`;
       }
       
-      if (!methodSpending[methodDisplayName]) {
-        methodSpending[methodDisplayName] = 0;
+      if (!methodSpending[displayName]) {
+        methodSpending[displayName] = 0;
       }
-      methodSpending[methodDisplayName] += transaction.amount;
+      methodSpending[displayName] += transaction.amount;
     });
     
     return Object.entries(methodSpending)
@@ -73,7 +66,6 @@ const SpendingAnalytics: React.FC = () => {
       .sort((a, b) => b.value - a.value);
   }, [filteredTransactions]);
 
-  // Trend data (by day or week)
   const trendData = useMemo(() => {
     if (filteredTransactions.length === 0) return [];
     
@@ -88,11 +80,9 @@ const SpendingAnalytics: React.FC = () => {
       groupByDate[date] += transaction.amount;
     });
     
-    // Sort by date
     return Object.entries(groupByDate)
       .map(([date, amount]) => ({ date, amount }))
       .sort((a, b) => {
-        // If in 7-day mode with day names, sort by day of week
         if (timeRange === '7days') {
           const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
           return days.indexOf(a.date) - days.indexOf(b.date);
@@ -101,12 +91,10 @@ const SpendingAnalytics: React.FC = () => {
       });
   }, [filteredTransactions, timeRange]);
 
-  // Calculate total spending
   const totalSpending = useMemo(() => {
     return filteredTransactions.reduce((sum, transaction) => sum + transaction.amount, 0);
   }, [filteredTransactions]);
 
-  // Get chart config based on current view
   const getChartContent = () => {
     switch (chartView) {
       case 'category':
@@ -202,7 +190,6 @@ const SpendingAnalytics: React.FC = () => {
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Spending Analytics</h1>
       
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-2 justify-between">
         <div>
           <Select value={timeRange} onValueChange={(val: any) => setTimeRange(val)}>
@@ -232,7 +219,6 @@ const SpendingAnalytics: React.FC = () => {
         </div>
       </div>
       
-      {/* Total Spending Card */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle>Total Spending</CardTitle>
@@ -247,7 +233,6 @@ const SpendingAnalytics: React.FC = () => {
         </CardContent>
       </Card>
       
-      {/* Chart Card */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle>
@@ -260,10 +245,8 @@ const SpendingAnalytics: React.FC = () => {
         </CardContent>
       </Card>
       
-      {/* Insight Cards */}
       {filteredTransactions.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Top Category */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Top Spending Category</CardTitle>
@@ -281,7 +264,6 @@ const SpendingAnalytics: React.FC = () => {
             </CardContent>
           </Card>
           
-          {/* Preferred Payment Method */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Preferred Payment Method</CardTitle>
