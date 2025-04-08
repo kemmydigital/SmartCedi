@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MoveUpRight, BarChart3, PiggyBank, AlertCircle, Wallet } from 'lucide-react';
+import { BarChart3, MoveUpRight, PiggyBank, AlertCircle } from 'lucide-react';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -15,8 +15,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Header */}
       <header className="bg-primary text-white p-4 shadow-md">
         <div className="container max-w-lg mx-auto flex items-center">
-          <Wallet className="mr-2" size={24} />
-          <h1 className="text-xl font-bold">Cedis Tracker</h1>
+          <img 
+            src="/lovable-uploads/b9b971af-a5ca-4669-b5cb-eaeb2df8fb9a.png" 
+            alt="SmartCedi Logo" 
+            className="h-8 mr-2"
+          />
           <div className="ml-auto">
             {/* Offline indicator */}
             <div className="flex items-center text-xs bg-black/10 px-2 py-1 rounded-full">

@@ -23,6 +23,9 @@ const queryClient = new QueryClient({
   },
 });
 
+// Set document title
+document.title = "SmartCedi";
+
 const App = () => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
