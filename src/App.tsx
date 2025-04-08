@@ -1,19 +1,11 @@
 import React from 'react';
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoanProvider } from "@/context/LoanContext";
-import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import TransactionsPage from "./pages/TransactionsPage";
-import BudgetPage from "./pages/BudgetPage";
-import SavingsPage from "./pages/SavingsPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
 import LoansPage from "./pages/LoansPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -36,25 +28,15 @@ const App = () => (
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           <LoanProvider>
-            <AppProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <Routes>
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignUpPage />} />
-                  <Route element={<ProtectedRoute />}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/transactions" element={<TransactionsPage />} />
-                    <Route path="/budget" element={<BudgetPage />} />
-                    <Route path="/savings" element={<SavingsPage />} />
-                    <Route path="/analytics" element={<AnalyticsPage />} />
-                    <Route path="/loans" element={<LoansPage />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </TooltipProvider>
-            </AppProvider>
+            <Toaster />
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/loans" element={<LoansPage />} />
+              </Route>
+            </Routes>
           </LoanProvider>
         </QueryClientProvider>
       </AuthProvider>
