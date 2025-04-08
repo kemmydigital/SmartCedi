@@ -3,7 +3,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import { Toaster } from "@/components/ui/toaster";
 
-export default function Layout() {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
