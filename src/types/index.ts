@@ -1,47 +1,45 @@
-
 export interface Transaction {
   id: string;
+  user_id: string;
   amount: number;
   type: 'income' | 'expense';
   category: string;
+  description?: string;
   date: string;
-  description: string;
-  paymentMethod: 'cash' | 'mobileMoney' | 'bank' | 'other';
-  mobileMoneyProvider?: 'MTN' | 'Vodafone' | 'AirtelTigo';
+  payment_method?: string;
 }
 
 export interface Budget {
   id: string;
+  user_id: string;
   category: string;
   amount: number;
   spent: number;
-  period: 'daily' | 'weekly' | 'monthly';
-  alertThreshold: number; // Percentage threshold for alerts (e.g., 80%)
+  alert_threshold?: number;
 }
 
 export interface SavingsGoal {
   id: string;
+  user_id: string;
   name: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  color: string;
+  target_amount: number;
+  current_amount: number;
+  target_date?: string;
 }
 
-export interface AppContextType {
-  transactions: Transaction[];
-  budgets: Budget[];
-  savingsGoals: SavingsGoal[];
-  isOffline: boolean;
-  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
-  addBudget: (budget: Omit<Budget, 'id' | 'spent'>) => void;
-  addSavingsGoal: (goal: Omit<SavingsGoal, 'id' | 'currentAmount'>) => void;
-  updateSavingsGoal: (id: string, amount: number) => void;
-  deleteTransaction: (id: string) => void;
-  deleteBudget: (id: string) => void;
-  deleteSavingsGoal: (id: string) => void;
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-  checkBudgetAlerts: () => {category: string; spent: number; amount: number; percentage: number}[];
+export interface Loan {
+  id: string;
+  user_id: string;
+  amount: number;
+  interest_rate: number;
+  term_weeks: number;
+  weekly_payment: number;
+  start_date: string;
+  status: 'active' | 'completed' | 'defaulted';
 }
+
+export type PaymentMethod = 
+  | 'cash' 
+  | 'mobileMoney' 
+  | 'bankTransfer' 
+  | 'card';
