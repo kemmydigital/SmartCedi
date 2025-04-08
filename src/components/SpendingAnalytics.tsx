@@ -54,15 +54,18 @@ const SpendingAnalytics: React.FC = () => {
     const methodSpending: Record<string, number> = {};
     
     filteredTransactions.forEach(transaction => {
-      let method = transaction.paymentMethod;
-      if (method === 'mobileMoney' && transaction.mobileMoneyProvider) {
-        method = transaction.mobileMoneyProvider;
+      // Here is the fix: We'll create a display name for the payment method
+      let methodDisplayName = transaction.paymentMethod;
+      
+      // If it's mobile money and has a provider, append the provider name
+      if (transaction.paymentMethod === 'mobileMoney' && transaction.mobileMoneyProvider) {
+        methodDisplayName = `${transaction.mobileMoneyProvider} Mobile Money`;
       }
       
-      if (!methodSpending[method]) {
-        methodSpending[method] = 0;
+      if (!methodSpending[methodDisplayName]) {
+        methodSpending[methodDisplayName] = 0;
       }
-      methodSpending[method] += transaction.amount;
+      methodSpending[methodDisplayName] += transaction.amount;
     });
     
     return Object.entries(methodSpending)
