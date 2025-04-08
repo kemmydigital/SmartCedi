@@ -21,6 +21,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onComplete }) => {
   const [category, setCategory] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'mobileMoney' | 'bank' | 'other'>('mobileMoney');
+  const [mobileMoneyProvider, setMobileMoneyProvider] = useState<'MTN' | 'Vodafone' | 'AirtelTigo'>('MTN');
 
   const categories = getCategories(type);
 
@@ -52,6 +53,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onComplete }) => {
       date: new Date().toISOString(),
       description: description || category,
       paymentMethod,
+      mobileMoneyProvider: paymentMethod === 'mobileMoney' ? mobileMoneyProvider : undefined,
     });
 
     toast({
@@ -140,6 +142,26 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onComplete }) => {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Mobile Money Provider (conditionally rendered) */}
+      {paymentMethod === 'mobileMoney' && (
+        <div className="space-y-2">
+          <Label htmlFor="mobile-money-provider">Mobile Money Provider</Label>
+          <Select 
+            value={mobileMoneyProvider} 
+            onValueChange={(val: any) => setMobileMoneyProvider(val)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="MTN">MTN Mobile Money</SelectItem>
+              <SelectItem value="Vodafone">Vodafone Cash</SelectItem>
+              <SelectItem value="AirtelTigo">AirtelTigo Money</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {/* Description */}
       <div className="space-y-2">

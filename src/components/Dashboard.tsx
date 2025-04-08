@@ -2,15 +2,16 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ArrowUpRight, ArrowDownRight, Plus } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Plus, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { formatCurrency } from '@/utils/localStorage';
 import TransactionForm from './TransactionForm';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
-  const { transactions, budgets, savingsGoals, balance, totalIncome, totalExpenses } = useAppContext();
+  const { transactions, budgets, savingsGoals, balance, totalIncome, totalExpenses, checkBudgetAlerts } = useAppContext();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   // Get recent transactions
@@ -26,6 +27,9 @@ const Dashboard: React.FC = () => {
   const totalSavingsTarget = savingsGoals.reduce((sum, goal) => sum + goal.targetAmount, 0);
   const totalSavingsAmount = savingsGoals.reduce((sum, goal) => sum + goal.currentAmount, 0);
   const savingsProgress = totalSavingsTarget > 0 ? (totalSavingsAmount / totalSavingsTarget) * 100 : 0;
+
+  // Get budget alerts
+  const budgetAlerts = checkBudgetAlerts();
 
   return (
     <div className="space-y-6">
@@ -51,6 +55,30 @@ const Dashboard: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Budget Alerts */}
+      {budgetAlerts.length > 0 && (
+        <Card className="bg-amber-50 border-amber-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <AlertTriangle size={16} className="mr-2 text-amber-600" />
+              Budget Alerts
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {budgetAlerts.slice(0, 3).map((alert) => (
+              <div key={alert.category} className="text-sm">
+                <span className="font-medium">{alert.category}:</span> Spent {formatCurrency(alert.spent)} of {formatCurrency(alert.amount)} ({Math.round(alert.percentage)}%)
+              </div>
+            ))}
+            {budgetAlerts.length > 3 && (
+              <div className="text-sm text-amber-600">
+                <Link to="/budget">View all {budgetAlerts.length} alerts</Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick Add Transaction */}
       <div className="flex justify-center">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -62,6 +90,9 @@ const Dashboard: React.FC = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add Transaction</DialogTitle>
+              <DialogDescription>
+                Record your income or expense
+              </DialogDescription>
             </DialogHeader>
             <TransactionForm onComplete={() => setIsDialogOpen(false)} />
           </DialogContent>
@@ -75,7 +106,11 @@ const Dashboard: React.FC = () => {
             <CardTitle className="text-sm font-medium">Budget Usage</CardTitle>
           </CardHeader>
           <CardContent>
-            <Progress value={budgetProgress} className="h-2 mb-2" />
+            <Progress 
+              value={budgetProgress} 
+              className="h-2 mb-2"
+              indicatorClassName={budgetProgress > 90 ? "bg-red-500" : budgetProgress > 75 ? "bg-amber-500" : ""}
+            />
             <div className="text-sm text-muted-foreground mt-1">
               {formatCurrency(totalBudgetSpent)} of {formatCurrency(totalBudgetAmount)}
             </div>
@@ -87,7 +122,7 @@ const Dashboard: React.FC = () => {
             <CardTitle className="text-sm font-medium">Savings Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <Progress value={savingsProgress} className="h-2 mb-2" />
+            <Progress value={savingsProgress} className="h-2 mb-2" indicatorClassName="bg-green-500" />
             <div className="text-sm text-muted-foreground mt-1">
               {formatCurrency(totalSavingsAmount)} of {formatCurrency(totalSavingsTarget)}
             </div>
@@ -109,6 +144,7 @@ const Dashboard: React.FC = () => {
                     <div className="font-medium">{transaction.description}</div>
                     <div className="text-xs text-muted-foreground">
                       {new Date(transaction.date).toLocaleDateString()} • {transaction.category}
+                      {transaction.mobileMoneyProvider && ` • ${transaction.mobileMoneyProvider}`}
                     </div>
                   </div>
                   <div className={`font-medium ${transaction.type === 'income' ? 'text-money-income' : 'text-money-expense'}`}>

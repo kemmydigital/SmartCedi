@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -10,19 +11,24 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, AlertTriangle, Bell } from 'lucide-react';
 import { getCategories } from '@/utils/localStorage';
+import { Slider } from '@/components/ui/slider';
 
 const Budget: React.FC = () => {
-  const { budgets, addBudget, deleteBudget } = useAppContext();
+  const { budgets, addBudget, deleteBudget, checkBudgetAlerts } = useAppContext();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   // Form state
   const [category, setCategory] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
+  const [alertThreshold, setAlertThreshold] = useState<number>(80); // Default alert at 80%
 
   const expenseCategories = getCategories('expense');
+  
+  // Get budget alerts
+  const budgetAlerts = checkBudgetAlerts();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +64,8 @@ const Budget: React.FC = () => {
     addBudget({
       category,
       amount: parseFloat(amount),
-      period
+      period,
+      alertThreshold
     });
 
     toast({
@@ -69,6 +76,7 @@ const Budget: React.FC = () => {
     // Reset form
     setAmount('');
     setCategory('');
+    setAlertThreshold(80);
     setIsDialogOpen(false);
   };
 
@@ -96,6 +104,25 @@ const Budget: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Budget Alerts */}
+      {budgetAlerts.length > 0 && (
+        <Card className="bg-amber-50 border-amber-200">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <AlertTriangle size={16} className="mr-2 text-amber-600" />
+              Budget Alerts
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {budgetAlerts.map((alert) => (
+              <div key={alert.category} className="text-sm">
+                <span className="font-medium">{alert.category}:</span> Spent {formatCurrency(alert.spent)} of {formatCurrency(alert.amount)} ({Math.round(alert.percentage)}%)
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Add Budget Button */}
       <div className="flex justify-center">
@@ -154,6 +181,24 @@ const Budget: React.FC = () => {
                 </Select>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="alert-threshold" className="flex items-center">
+                  <Bell size={14} className="mr-1" /> 
+                  Alert Threshold: {alertThreshold}%
+                </Label>
+                <Slider 
+                  id="alert-threshold"
+                  defaultValue={[alertThreshold]} 
+                  max={100} 
+                  step={5}
+                  onValueChange={(values) => setAlertThreshold(values[0])}
+                  className="py-4"
+                />
+                <div className="text-xs text-muted-foreground">
+                  You'll receive alerts when spending reaches this percentage of your budget.
+                </div>
+              </div>
+
               <Button type="submit" className="w-full">
                 Create Budget
               </Button>
@@ -170,14 +215,22 @@ const Budget: React.FC = () => {
             {budgets.map((budget) => {
               const progress = (budget.spent / budget.amount) * 100;
               const isOverBudget = budget.spent > budget.amount;
+              const isApproachingLimit = progress >= budget.alertThreshold && !isOverBudget;
               
               return (
-                <Card key={budget.id} className="overflow-hidden">
+                <Card key={budget.id} className={`overflow-hidden ${isApproachingLimit ? 'border-amber-300' : ''}`}>
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-medium">{budget.category}</div>
-                        <div className="text-xs text-muted-foreground capitalize">{budget.period}</div>
+                      <div className="flex items-center">
+                        <div>
+                          <div className="font-medium">{budget.category}</div>
+                          <div className="text-xs text-muted-foreground capitalize">{budget.period}</div>
+                        </div>
+                        {isApproachingLimit && (
+                          <div className="ml-2 text-amber-500">
+                            <AlertTriangle size={16} />
+                          </div>
+                        )}
                       </div>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -205,12 +258,12 @@ const Budget: React.FC = () => {
                     <div className="mt-4">
                       <Progress 
                         value={Math.min(progress, 100)} 
-                        className={`h-2 ${isOverBudget ? 'bg-red-200' : ''}`}
-                        indicatorClassName={isOverBudget ? 'bg-destructive' : ''}
+                        className={`h-2 ${isOverBudget ? 'bg-red-200' : isApproachingLimit ? 'bg-amber-200' : ''}`}
+                        indicatorClassName={isOverBudget ? 'bg-destructive' : isApproachingLimit ? 'bg-amber-500' : ''}
                       />
                       <div className="flex justify-between mt-2">
                         <div className="text-sm">
-                          <span className={isOverBudget ? 'text-destructive' : ''}>
+                          <span className={isOverBudget ? 'text-destructive' : isApproachingLimit ? 'text-amber-600' : ''}>
                             {formatCurrency(budget.spent)}
                           </span> of {formatCurrency(budget.amount)}
                         </div>
@@ -221,6 +274,9 @@ const Budget: React.FC = () => {
                             <span>{formatCurrency(budget.amount - budget.spent)} left</span>
                           )}
                         </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Alert at {budget.alertThreshold}% of budget
                       </div>
                     </div>
                   </CardContent>

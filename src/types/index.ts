@@ -7,6 +7,7 @@ export interface Transaction {
   date: string;
   description: string;
   paymentMethod: 'cash' | 'mobileMoney' | 'bank' | 'other';
+  mobileMoneyProvider?: 'MTN' | 'Vodafone' | 'AirtelTigo';
 }
 
 export interface Budget {
@@ -15,6 +16,7 @@ export interface Budget {
   amount: number;
   spent: number;
   period: 'daily' | 'weekly' | 'monthly';
+  alertThreshold: number; // Percentage threshold for alerts (e.g., 80%)
 }
 
 export interface SavingsGoal {
@@ -41,4 +43,5 @@ export interface AppContextType {
   totalIncome: number;
   totalExpenses: number;
   balance: number;
+  checkBudgetAlerts: () => {category: string; spent: number; amount: number; percentage: number}[];
 }

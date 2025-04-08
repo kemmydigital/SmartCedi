@@ -75,6 +75,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const balance = totalIncome - totalExpenses;
 
+  // Check for budget alerts
+  const checkBudgetAlerts = () => {
+    return budgets.filter(budget => {
+      const percentage = budget.spent / budget.amount * 100;
+      return percentage >= budget.alertThreshold;
+    }).map(budget => ({
+      category: budget.category,
+      spent: budget.spent,
+      amount: budget.amount,
+      percentage: (budget.spent / budget.amount * 100)
+    }));
+  };
+
   // Actions
   const addTransaction = (transaction: Omit<Transaction, 'id'>) => {
     const newTransaction = { ...transaction, id: generateId() };
@@ -93,7 +106,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addBudget = (budget: Omit<Budget, 'id' | 'spent'>) => {
-    const newBudget = { ...budget, id: generateId(), spent: 0 };
+    const newBudget = { 
+      ...budget, 
+      id: generateId(), 
+      spent: 0,
+      alertThreshold: budget.alertThreshold || 80 // Default alert at 80% if not provided
+    };
     setBudgets(prev => [...prev, newBudget]);
   };
 
@@ -163,6 +181,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     totalIncome,
     totalExpenses,
     balance,
+    checkBudgetAlerts,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
