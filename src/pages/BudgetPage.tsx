@@ -1,14 +1,14 @@
 
 import React from 'react';
 import Layout from '@/components/Layout';
-import Dashboard from '@/components/Dashboard';
+import Budget from '@/components/Budget';
 
-const Index = () => {
+const BudgetPage = () => {
   return (
     <Layout>
-      <Dashboard />
+      <Budget />
     </Layout>
   );
 };
 
-export default Index;
+export default BudgetPage;
