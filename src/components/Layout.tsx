@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,7 +13,20 @@ export default function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between">
           <div className="flex items-center space-x-4">
-            <span className="font-bold">SmartCedi</span>
+            <Link to="/" className="font-bold hover:text-primary">
+              SmartCedi
+            </Link>
+            <nav className="hidden md:flex space-x-6">
+              <Link to="/loans" className="text-sm hover:text-primary">
+                Loans
+              </Link>
+              <Link to="/savings" className="text-sm hover:text-primary">
+                Savings
+              </Link>
+              <Link to="/transactions" className="text-sm hover:text-primary">
+                Transactions
+              </Link>
+            </nav>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -23,6 +36,7 @@ export default function Layout({ children }: LayoutProps) {
       </header>
       <main className="container py-4">
         <Outlet />
+        {children}
       </main>
       <Toaster />
     </div>

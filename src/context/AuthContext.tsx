@@ -40,10 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        if (event === "SIGNED_IN") {
-          navigate("/");
+      (event, session) => {
+        try {
+          setUser(session?.user ?? null);
+          if (event === "SIGNED_IN") {
+            navigate("/");
+          }
+        } catch (error) {
+          console.error('Auth state change error:', error);
         }
       }
     );

@@ -1,10 +1,17 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, TrendingUp, Shield } from 'lucide-react';
-import { useLoan } from '@/context/LoanContext';
-import { formatCurrency } from '@/utils/localStorage';
-import { Button } from '@/components/ui/button';
+import { useLoan } from "@/context/LoanContext";
+import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
+
+// Simple currency formatter
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(value);
+};
 
 const Dashboard: React.FC = () => {
   const { loans, savings } = useLoan();
@@ -17,7 +24,7 @@ const Dashboard: React.FC = () => {
   const totalInsurance = totalLoanAmount * 0.03;
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-8">
       {/* Loan System Overview */}
       <Card>
         <CardHeader className="pb-2">
