@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import { showToast } from "@/lib/toast";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   document.documentElement.classList.remove('dark');
@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +25,8 @@ export default function LoginPage() {
         description: error.message,
         variant: "destructive"
       });
+    } else {
+      navigate("/dashboard"); // Redirect to dashboard after login
     }
   };
 

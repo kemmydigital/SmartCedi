@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { Navigate } from "react-router-dom";
 
 export default function Index() {
+  const { user } = useAuth();
+
   useEffect(() => {
     // Restore user's theme preference
     if (localStorage.theme === 'dark' || 
@@ -14,17 +16,10 @@ export default function Index() {
     }
   }, []);
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-3xl font-bold mb-6">Welcome to SmartCedi</h1>
-      <div className="flex gap-4">
-        <Button asChild>
-          <Link to="/login">Login</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link to="/signup">Sign Up</Link>
-        </Button>
-      </div>
-    </div>
-  );
+  // Redirect to dashboard if logged in
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Navigate to="/login" replace />;
 }
