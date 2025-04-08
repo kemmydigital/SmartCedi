@@ -38,21 +38,19 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignUpPage />} />
-                  <Route element={<ProtectedRoute />}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/transactions" element={<TransactionsPage />} />
-                    <Route path="/budget" element={<BudgetPage />} />
-                    <Route path="/savings" element={<SavingsPage />} />
-                    <Route path="/analytics" element={<AnalyticsPage />} />
-                    <Route path="/loans" element={<LoansPage />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/transactions" element={<TransactionsPage />} />
+                  <Route path="/budget" element={<BudgetPage />} />
+                  <Route path="/savings" element={<SavingsPage />} />
+                  <Route path="/analytics" element={<AnalyticsPage />} />
+                  <Route path="/loans" element={<LoansPage />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
             </TooltipProvider>
           </AppProvider>
         </LoanProvider>
